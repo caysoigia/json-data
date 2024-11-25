@@ -1,29 +1,46 @@
-const canvas = document.querySelector("#game canvas");
-function moveMouseRandomly(clientX, clientY) {
-  function move() {
-    const mouseMoveEvent = new MouseEvent('click', {
-      clientX: clientX, clientY: clientY
-    });
-    canvas.dispatchEvent(mouseMoveEvent);
-  }
-  move();
-}
-
-const delay = millis => new Promise((resolve, reject) => {
-  setTimeout(_ => resolve(), millis)
+let arr = await fetch('https://raw.githubusercontent.com/caysoigia/json-data/refs/heads/master/bums-youtube-hidden-code.json').then(response => {
+  return response.json();
+}).then(data => {
+  return JSON.stringify(data);
+}).catch(err => {
+  return JSON.stringify(
+    {
+      "0": "42858",
+      "1": "95065",
+      "2": "88125",
+      "3": "51264",
+      "4": "13527"
+    }
+  )
+  // Do something for an error here
 });
 
-function getRandom(min, max) {
-  return (Math.random() * (max - min)) + min;
+function getElementByXpath(path) {
+  return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 }
 
-let step = 20;
-let decrease = 100;
-for (let y = 0; y < Math.round(($canvasHeight - decrease) / step); y++) {
-  let coorY = step * y + decrease;
-  for (let x = 0; x < Math.round($canvasWidth / step); x++) {
-    let coorX = step * x;
-    moveMouseRandomly(coorX, coorY);
-  }
-  delay(40)
-}
+let elm = getElementByXpath('//*[@role="dialog" and not(contains(@style, "display: none"))]//*[contains(text(),"Find hidden code")]');
+let epNum = elm.textContent.replace(/[^0-9]/g, "");
+
+let hiddenCodeArr = JSON.parse(arr);
+console.log(arr, hiddenCodeArr[epNum]);
+
+let input = getElementByXpath('//input[@placeholder="Enter the CODE"]');
+input.value = hiddenCodeArr[epNum]
+input.dispatchEvent(new Event('input', {bubbles: true}));
+
+// function setNativeValue(element, value) {
+//   console.log(element)
+//   const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+//   const prototype = Object.getPrototypeOf(element);
+//   const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+
+//   if (valueSetter && valueSetter !== prototypeValueSetter) {
+//     prototypeValueSetter.call(element, value);
+//   } else {
+//     valueSetter.call(element, value);
+//   }
+// }
+
+// setNativeValue(input, hiddenCodeArr[epNum])
+// input.dispatchEvent(new Event('input', { bubbles: true }));
